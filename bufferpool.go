@@ -39,27 +39,16 @@ type bufferPool struct {
 }
 
 // newBufferPool creates a new buffer pool with buffers of the given size.
-func newBufferPool(size int) *bufferPool {
-	return &bufferPool{
-		xmitBuf: sync.Pool{
-			New: func() any {
-				return make([]byte, size)
-			},
-		},
-	}
-}
+func newBufferPool(size int) *bufferPool { _ = "STUB: not implemented"; return nil }
 
 // Get retrieves a buffer from the pool.
-func (bp *bufferPool) Get() []byte {
-	return bp.xmitBuf.Get().([]byte)
-}
+func (bp *bufferPool) Get() []byte { _ = "STUB: not implemented"; return nil }
 
 // Put returns a buffer to the pool.
 func (bp *bufferPool) Put(buf []byte) error {
+	_ = "STUB: not implemented"
 	// Only put back buffers of the correct size.
-	if cap(buf) != mtuLimit {
-		return errBufferSizeMismatch
-	}
-	bp.xmitBuf.Put(buf[:cap(buf)]) // reset slice length to full capacity
 	return nil
 }
+
+// reset slice length to full capacity

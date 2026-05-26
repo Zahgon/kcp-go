@@ -23,9 +23,7 @@
 package kcp
 
 import (
-	"crypto/aes"
 	"crypto/cipher"
-	crand "crypto/rand"
 	"io"
 	"math/rand/v2"
 	"runtime"
@@ -48,26 +46,17 @@ var (
 )
 
 // NewEntropy creates a new entropy source.
-func NewEntropy() io.Reader {
-	if hasAESHardwareSupport {
-		return NewEntropyAES()
-	}
-
-	return NewEntropyChacha8()
-}
+func NewEntropy() io.Reader { _ = "STUB: not implemented"; return *new(io.Reader) }
 
 // SetEntropy sets the global entropy source used by fillRand.
 func SetEntropy(r io.Reader) {
-	entropy = r
+	_ = "STUB: not implemented"
+
+	// fillRand fills p with random data from the global entropy source.
+	return
 }
 
-// fillRand fills p with random data from the global entropy source.
-func fillRand(p []byte) {
-	if len(p) <= 0 {
-		return
-	}
-	io.ReadFull(entropy, p)
-}
+func fillRand(p []byte) { _ = "STUB: not implemented"; return }
 
 // rngAES is an AES-based random number generator.
 type rngAES struct {
@@ -78,53 +67,13 @@ type rngAES struct {
 }
 
 // NewEntropyAES creates a new AES-based entropy source.
-func NewEntropyAES() io.Reader {
-	r := new(rngAES)
-
-	var key [16]byte
-	io.ReadFull(crand.Reader, key[:])
-	io.ReadFull(crand.Reader, r.seed[:])
-
-	block, err := aes.NewCipher(key[:])
-	if err != nil {
-		panic(err)
-	}
-	r.block = block
-	return r
-}
+func NewEntropyAES() io.Reader { _ = "STUB: not implemented"; return *new(io.Reader) }
 
 // updateSeed updates the AES seed after a certain number of reads.
-func (r *rngAES) updateSeed() {
-	if r.count < reseedInterval {
-		r.count++
-		return
-	}
-
-	var key [16]byte
-	io.ReadFull(crand.Reader, key[:])
-	io.ReadFull(crand.Reader, r.seed[:])
-
-	block, err := aes.NewCipher(key[:])
-	if err != nil {
-		panic(err)
-	}
-	r.block = block
-	r.count = 0
-}
+func (r *rngAES) updateSeed() { _ = "STUB: not implemented"; return }
 
 // Read fills p with random data using AES encryption.
-func (r *rngAES) Read(p []byte) (int, error) {
-	if len(p) == 0 {
-		return 0, nil
-	}
-
-	r.mutex.Lock()
-	r.updateSeed()
-	r.block.Encrypt(r.seed[:], r.seed[:])
-	n := copy(p, r.seed[:])
-	r.mutex.Unlock()
-	return n, nil
-}
+func (r *rngAES) Read(p []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
 // rngChacha8 is a ChaCha8-based random number generator.
 type rngChacha8 struct {
@@ -134,38 +83,10 @@ type rngChacha8 struct {
 }
 
 // NewEntropyChacha8 creates a new ChaCha8-based entropy source.
-func NewEntropyChacha8() io.Reader {
-	var seed [32]byte
-	io.ReadFull(crand.Reader, seed[:])
-
-	return &rngChacha8{
-		rand: rand.NewChaCha8(seed),
-	}
-}
+func NewEntropyChacha8() io.Reader { _ = "STUB: not implemented"; return *new(io.Reader) }
 
 // updateSeed updates the ChaCha8 seed after a certain number of reads.
-func (r *rngChacha8) updateSeed() {
-	if r.count < reseedInterval {
-		r.count++
-		return
-	}
-
-	var seed [32]byte
-	io.ReadFull(crand.Reader, seed[:])
-
-	r.rand.Seed(seed)
-	r.count = 0
-}
+func (r *rngChacha8) updateSeed() { _ = "STUB: not implemented"; return }
 
 // Read fills p with random data using ChaCha8.
-func (r *rngChacha8) Read(p []byte) (int, error) {
-	if len(p) == 0 {
-		return 0, nil
-	}
-
-	r.mutex.Lock()
-	r.updateSeed()
-	n, err := r.rand.Read(p)
-	r.mutex.Unlock()
-	return n, err
-}
+func (r *rngChacha8) Read(p []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }

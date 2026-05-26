@@ -24,14 +24,6 @@
 
 package kcp
 
-import (
-	"net"
-	"sync/atomic"
-
-	"github.com/pkg/errors"
-	"golang.org/x/net/ipv4"
-)
-
 const (
 	batchSize = 256 // max packets per recvmmsg/sendmmsg call
 )
@@ -39,91 +31,21 @@ const (
 // readLoop is the optimized read loop for Linux, utilizing the recvmmsg syscall
 // to batch-receive multiple UDP packets in a single system call.
 func (s *UDPSession) readLoop() {
+	_ = "STUB: not implemented"
 	// default version
-	if s.platform.batchConn == nil {
-		s.defaultReadLoop()
-		return
-	}
-
-	// x/net version
-	var src *net.UDPAddr
-	var srcStr string
-	if s.remote != nil {
-		if udp, ok := s.remote.(*net.UDPAddr); ok {
-			src = udp
-		} else {
-			srcStr = s.remote.String()
-		}
-	}
-	msgs := make([]ipv4.Message, batchSize)
-	for k := range msgs {
-		msgs[k].Buffers = [][]byte{make([]byte, mtuLimit)}
-	}
-
-	for {
-		count, err := s.platform.batchConn.ReadBatch(msgs, 0)
-		if err != nil {
-			s.notifyReadError(errors.WithStack(err))
-			return
-		}
-
-		if s.isClosed() {
-			return
-		}
-
-		for i := range count {
-			msg := &msgs[i]
-
-			// make sure the packet is from the same source
-			if src == nil && srcStr == "" { // set source address if nil
-				if udp, ok := msg.Addr.(*net.UDPAddr); ok {
-					src = udp
-				} else {
-					srcStr = msg.Addr.String()
-				}
-			} else if src != nil {
-				udp, ok := msg.Addr.(*net.UDPAddr)
-				if !ok || !sameUDPAddr(src, udp) {
-					atomic.AddUint64(&DefaultSnmp.InErrs, 1)
-					continue
-				}
-			} else if msg.Addr.String() != srcStr {
-				atomic.AddUint64(&DefaultSnmp.InErrs, 1)
-				continue
-			}
-
-			// source and size has validated
-			s.packetInput(msg.Buffers[0][:msg.N])
-		}
-	}
+	return
 }
+
+// x/net version
+
+// make sure the packet is from the same source
+// set source address if nil
+
+// source and size has validated
 
 // monitor is the optimized version of monitor for linux utilizing recvmmsg syscall
-func (l *Listener) monitor() {
-	batchConn := newBatchConn(l.conn)
+func (l *Listener) monitor() { _ = "STUB: not implemented"; return }
 
-	// default version
-	if batchConn == nil {
-		l.defaultMonitor()
-		return
-	}
+// default version
 
-	// x/net version
-	msgs := make([]ipv4.Message, batchSize)
-	for k := range msgs {
-		msgs[k].Buffers = [][]byte{make([]byte, mtuLimit)}
-	}
-
-	for {
-		count, err := batchConn.ReadBatch(msgs, 0)
-		if err != nil {
-			l.notifyReadError(errors.WithStack(err))
-			return
-		}
-
-		for i := range count {
-			msg := &msgs[i]
-			l.packetInput(msg.Buffers[0][:msg.N], msg.Addr)
-		}
-	}
-}
+// x/net version

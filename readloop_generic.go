@@ -24,10 +24,6 @@
 
 package kcp
 
-func (s *UDPSession) readLoop() {
-	s.defaultReadLoop()
-}
+func (s *UDPSession) readLoop() { _ = "STUB: not implemented"; return }
 
-func (l *Listener) monitor() {
-	l.defaultMonitor()
-}
+func (l *Listener) monitor() { _ = "STUB: not implemented"; return }

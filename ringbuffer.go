@@ -37,208 +37,81 @@ type RingBuffer[T any] struct {
 
 // NewRingBuffer creates a new Ring with a specified initial capacity.
 // If the provided size is <= 8, it defaults to 8.
-func NewRingBuffer[T any](size int) *RingBuffer[T] {
-	if size <= RINGBUFFER_MIN {
-		size = RINGBUFFER_MIN // Ensure a minimum size
-	}
-	return &RingBuffer[T]{
-		head:     0,
-		tail:     0,
-		elements: make([]T, size),
-	}
-}
+func NewRingBuffer[T any](size int) *RingBuffer[T] { _ = "STUB: not implemented"; return nil }
+
+// Ensure a minimum size
 
 // Len returns the number of elements currently in the ring.
-func (r *RingBuffer[T]) Len() int {
-	if r.head <= r.tail {
-		return r.tail - r.head
-	}
-	// Wrapped case: elements from head to end + elements from start to tail
-	return len(r.elements) - r.head + r.tail
-}
+func (r *RingBuffer[T]) Len() int { _ = "STUB: not implemented"; return 0 }
+
+// Wrapped case: elements from head to end + elements from start to tail
 
 // Push adds an element to the tail of the ring.
 // If the ring is full, it will grow automatically.
-func (r *RingBuffer[T]) Push(v T) {
-	if r.IsFull() {
-		r.grow()
-	}
-	r.elements[r.tail] = v
-	r.tail = (r.tail + 1) % len(r.elements)
-}
+func (r *RingBuffer[T]) Push(v T) { _ = "STUB: not implemented"; return }
 
 // Pop removes and returns the element from the head of the ring.
 // It returns the zero value and false if the ring is empty.
-func (r *RingBuffer[T]) Pop() (T, bool) {
-	var zero T
-	if r.Len() == 0 {
-		return zero, false
-	}
-	value := r.elements[r.head]
-	// Optional: clear the slot to avoid retaining references
-	r.elements[r.head] = zero
-	r.head = (r.head + 1) % len(r.elements)
-	return value, true
-}
+func (r *RingBuffer[T]) Pop() (T, bool) { _ = "STUB: not implemented"; return *new(T), false }
+
+// Optional: clear the slot to avoid retaining references
 
 // Peek returns the element at the head of the ring without removing it.
 // It returns the zero value and false if the ring is empty.
-func (r *RingBuffer[T]) Peek() (*T, bool) {
-	if r.Len() == 0 {
-		return nil, false
-	}
-	return &r.elements[r.head], true
-}
+func (r *RingBuffer[T]) Peek() (*T, bool) { _ = "STUB: not implemented"; return nil, false }
 
 // Discard discards the first N elements from the ring buffer.
 // Returns the number of elements that are actually discarded (<= n).
-func (r *RingBuffer[T]) Discard(n int) int {
-	currentLen := r.Len()
-	n = min(n, currentLen)
-	if n == currentLen {
-		r.Clear()
-		return n
-	}
-	cap := len(r.elements)
-	end := r.head + n
-	if end < cap {
-		// no wrap: clear contiguous range
-		clear(r.elements[r.head:end])
-		r.head = end
-	} else {
-		// wraps around
-		clear(r.elements[r.head:cap])
-		clear(r.elements[:end-cap])
-		r.head = end - cap
-	}
-	return n
-}
+func (r *RingBuffer[T]) Discard(n int) int { _ = "STUB: not implemented"; return 0 }
+
+// no wrap: clear contiguous range
+
+// wraps around
 
 // ForEach iterates over each element in the ring buffer,
 // applying the provided function. If the function returns false,
 // iteration stops early.
-func (r *RingBuffer[T]) ForEach(fn func(*T) bool) {
-	if r.Len() == 0 {
-		return
-	}
-	if r.head < r.tail {
-		// Contiguous data: [head ... tail)
-		for i := r.head; i < r.tail; i++ {
-			if !fn(&r.elements[i]) {
-				return
-			}
-		}
-	} else {
-		// Wrapped data: [head ... end) + [0 ... tail)
-		for i := r.head; i < len(r.elements); i++ {
-			if !fn(&r.elements[i]) {
-				return
-			}
-		}
-		for i := 0; i < r.tail; i++ {
-			if !fn(&r.elements[i]) {
-				return
-			}
-		}
-	}
-}
+func (r *RingBuffer[T]) ForEach(fn func(*T) bool) { _ = "STUB: not implemented"; return }
+
+// Contiguous data: [head ... tail)
+
+// Wrapped data: [head ... end) + [0 ... tail)
 
 // ForEachReverse iterates over each element in the ring buffer in reverse order,
 // applying the provided function. If the function returns false,
 // iteration stops early.
-func (r *RingBuffer[T]) ForEachReverse(fn func(*T) bool) {
-	if r.Len() == 0 {
-		return
-	}
+func (r *RingBuffer[T]) ForEachReverse(fn func(*T) bool) { _ = "STUB: not implemented"; return }
 
-	if r.head < r.tail {
-		// Contiguous data: [head ... tail)
-		for i := r.tail - 1; i >= r.head; i-- {
-			if !fn(&r.elements[i]) {
-				return
-			}
-		}
-	} else {
-		for i := r.tail - 1; i >= 0; i-- {
-			if !fn(&r.elements[i]) {
-				return
-			}
-		}
-		for i := len(r.elements) - 1; i >= r.head; i-- {
-			if !fn(&r.elements[i]) {
-				return
-			}
-		}
-	}
-}
+// Contiguous data: [head ... tail)
 
 // Clear resets the ring to an empty state and reinitializes the buffer.
 func (r *RingBuffer[T]) Clear() {
-	var zero T
+	_ = "STUB: not implemented"
+
 	// Only clear elements that contain data to avoid retaining references
-	if r.head <= r.tail {
-		for i := r.head; i < r.tail; i++ {
-			r.elements[i] = zero
-		}
-	} else {
-		for i := r.head; i < len(r.elements); i++ {
-			r.elements[i] = zero
-		}
-		for i := 0; i < r.tail; i++ {
-			r.elements[i] = zero
-		}
-	}
-	r.head = 0
-	r.tail = 0
+	return
 }
 
 // IsEmpty returns true if the ring has no elements.
-func (r *RingBuffer[T]) IsEmpty() bool {
-	return r.head == r.tail
-}
+func (r *RingBuffer[T]) IsEmpty() bool { _ = "STUB: not implemented"; return false }
 
 // MaxLen returns the maximum capacity of the ring buffer.
-func (r *RingBuffer[T]) MaxLen() int {
-	return len(r.elements) - 1
-}
+func (r *RingBuffer[T]) MaxLen() int { _ = "STUB: not implemented"; return 0 }
 
 // IsFull returns true if the ring buffer is full (tail + 1 == head).
-func (r *RingBuffer[T]) IsFull() bool {
-	return (r.tail+1)%len(r.elements) == r.head
-}
+func (r *RingBuffer[T]) IsFull() bool { _ = "STUB: not implemented"; return false }
 
 // grow increases the ring buffer's capacity when full.
 // Growth policy:
 //   - If current size < RINGBUFFER_MIN : grow to RINGBUFFER_MIN
 //   - If size < RINGBUFFER_EXP: double the size
 //   - If size > RINGBUFFER_EXP: increase by 10% (rounded up)
-func (r *RingBuffer[T]) grow() {
-	currentLength := r.Len()
-	currentSize := len(r.elements)
-	var newSize int
+func (r *RingBuffer[T]) grow() { _ = "STUB: not implemented"; return }
 
-	switch {
-	case currentSize < RINGBUFFER_MIN:
-		newSize = RINGBUFFER_MIN
-	case currentSize < RINGBUFFER_EXP:
-		newSize = currentSize * 2
-	default:
-		newSize = currentSize + (currentSize+9)/10 // +10%, rounded up
-	}
+// +10%, rounded up
 
-	newElements := make([]T, newSize)
+// Copy elements to new buffer preserving logical order
 
-	// Copy elements to new buffer preserving logical order
-	if r.head < r.tail {
-		// Contiguous data: [head ... tail)
-		copy(newElements, r.elements[r.head:r.tail])
-	} else {
-		// Wrapped data: [head ... end) + [0 ... tail)
-		n := copy(newElements, r.elements[r.head:])
-		copy(newElements[n:], r.elements[:r.tail])
-	}
+// Contiguous data: [head ... tail)
 
-	r.head = 0
-	r.tail = currentLength
-	r.elements = newElements
-}
+// Wrapped data: [head ... end) + [0 ... tail)

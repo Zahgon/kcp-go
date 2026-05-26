@@ -25,38 +25,15 @@
 package kcp
 
 import (
-	"sync/atomic"
-
-	"github.com/pkg/errors"
 	"golang.org/x/net/ipv4"
 )
 
 // tx is the optimized transmit path for Linux, utilizing the sendmmsg syscall
 // to batch-send multiple UDP packets in a single system call.
 func (s *UDPSession) tx(txqueue []ipv4.Message) {
+	_ = "STUB: not implemented"
 	// default version
-	if s.platform.batchConn == nil {
-		s.defaultTx(txqueue)
-		return
-	}
-
-	// x/net version
-	nbytes := 0
-	npkts := 0
-	for len(txqueue) > 0 {
-		n, err := s.platform.batchConn.WriteBatch(txqueue, 0)
-		if err != nil {
-			s.notifyWriteError(errors.WithStack(err))
-			break
-		}
-
-		for k := range txqueue[:n] {
-			nbytes += len(txqueue[k].Buffers[0])
-		}
-		npkts += n
-		txqueue = txqueue[n:]
-	}
-
-	atomic.AddUint64(&DefaultSnmp.OutPkts, uint64(npkts))
-	atomic.AddUint64(&DefaultSnmp.OutBytes, uint64(nbytes))
+	return
 }
+
+// x/net version

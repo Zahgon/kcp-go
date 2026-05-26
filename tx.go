@@ -23,26 +23,8 @@
 package kcp
 
 import (
-	"sync/atomic"
-
-	"github.com/pkg/errors"
 	"golang.org/x/net/ipv4"
 )
 
 // defaultTx is the default transmission function for UDP sessions.
-func (s *UDPSession) defaultTx(txqueue []ipv4.Message) {
-	nbytes := 0
-	npkts := 0
-	for k := range txqueue {
-		n, err := s.conn.WriteTo(txqueue[k].Buffers[0], txqueue[k].Addr)
-		if err != nil {
-			s.notifyWriteError(errors.WithStack(err))
-			break
-		}
-
-		nbytes += n
-		npkts++
-	}
-	atomic.AddUint64(&DefaultSnmp.OutPkts, uint64(npkts))
-	atomic.AddUint64(&DefaultSnmp.OutBytes, uint64(nbytes))
-}
+func (s *UDPSession) defaultTx(txqueue []ipv4.Message) { _ = "STUB: not implemented"; return }

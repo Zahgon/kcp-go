@@ -29,7 +29,6 @@ import (
 	"syscall"
 
 	"golang.org/x/net/ipv4"
-	"golang.org/x/net/ipv6"
 )
 
 type (
@@ -52,25 +51,10 @@ type (
 )
 
 // newBatchConn creates a batchConn based on the IP version of the provided net.PacketConn.
-func newBatchConn(conn net.PacketConn) batchConn {
-	if _, ok := conn.(udpConn); !ok {
-		return nil
-	}
+func newBatchConn(conn net.PacketConn) batchConn { _ = "STUB: not implemented"; return *new(batchConn) }
 
-	// Resolve the local UDP address to determine IP version
-	addr, err := net.ResolveUDPAddr("udp", conn.LocalAddr().String())
-	if err != nil {
-		return nil
-	}
+// Resolve the local UDP address to determine IP version
 
-	// Determine if the connection is IPv4 or IPv6 based on the local address
-	if addr.IP.To4() != nil {
-		return ipv4.NewPacketConn(conn)
-	}
+// Determine if the connection is IPv4 or IPv6 based on the local address
 
-	return ipv6.NewPacketConn(conn)
-}
-
-func (sess *UDPSession) initPlatform() {
-	sess.platform.batchConn = newBatchConn(sess.conn)
-}
+func (sess *UDPSession) initPlatform() { _ = "STUB: not implemented"; return }

@@ -26,4 +26,4 @@ package kcp
 
 type platform struct{}
 
-func (sess *UDPSession) initPlatform() {}
+func (sess *UDPSession) initPlatform() { _ = "STUB: not implemented"; return }

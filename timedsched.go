@@ -23,7 +23,6 @@
 package kcp
 
 import (
-	"container/heap"
 	"runtime"
 	"sync"
 	"time"
@@ -41,18 +40,13 @@ type timedFunc struct {
 // a heap for sorted timed function
 type timedFuncHeap []timedFunc
 
-func (h timedFuncHeap) Len() int           { return len(h) }
-func (h timedFuncHeap) Less(i, j int) bool { return h[i].ts.Before(h[j].ts) }
-func (h timedFuncHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
-func (h *timedFuncHeap) Push(x any)        { *h = append(*h, x.(timedFunc)) }
-func (h *timedFuncHeap) Pop() any {
-	old := *h
-	n := len(old)
-	x := old[n-1]
-	old[n-1] = timedFunc{} // clear to avoid memory leak (both execute and ts)
-	*h = old[:n-1]
-	return x
-}
+func (h timedFuncHeap) Len() int           { _ = "STUB: not implemented"; return 0 }
+func (h timedFuncHeap) Less(i, j int) bool { _ = "STUB: not implemented"; return false }
+func (h timedFuncHeap) Swap(i, j int)      { _ = "STUB: not implemented"; return }
+func (h *timedFuncHeap) Push(x any)        { _ = "STUB: not implemented"; return }
+func (h *timedFuncHeap) Pop() any          { _ = "STUB: not implemented"; return *new(any) }
+
+// clear to avoid memory leak (both execute and ts)
 
 // TimedSched is a two-stage parallel scheduler for timed task execution.
 //
@@ -86,99 +80,26 @@ type TimedSched struct {
 }
 
 // NewTimedSched creates a parallel-scheduler with given parallelization
-func NewTimedSched(parallel int) *TimedSched {
-	ts := new(TimedSched)
-	ts.chTask = make(chan timedFunc)
-	ts.die = make(chan struct{})
-	ts.chPrependNotify = make(chan struct{}, 1)
-
-	for range parallel {
-		go ts.sched()
-	}
-	go ts.prepend()
-	return ts
-}
+func NewTimedSched(parallel int) *TimedSched { _ = "STUB: not implemented"; return nil }
 
 // sched is a worker goroutine (Stage 2) that manages a local min-heap
 // of timed tasks. It executes tasks when their deadline arrives.
-func (ts *TimedSched) sched() {
-	timer := time.NewTimer(0)
-	defer timer.Stop()
+func (ts *TimedSched) sched() { _ = "STUB: not implemented"; return }
 
-	var tasks timedFuncHeap
-	drained := false
-	for {
-		select {
-		case task := <-ts.chTask:
-			now := time.Now()
-			if now.After(task.ts) {
-				// already delayed! execute immediately
-				task.execute()
-			} else {
-				heap.Push(&tasks, task)
-				// properly reset timer to trigger based on the top element
-				stopped := timer.Stop()
-				if !stopped && !drained {
-					<-timer.C
-				}
-				timer.Reset(tasks[0].ts.Sub(now))
-				drained = false
-			}
-		case now := <-timer.C:
-			drained = true
-			for tasks.Len() > 0 {
-				if now.After(tasks[0].ts) {
-					heap.Pop(&tasks).(timedFunc).execute()
-				} else {
-					timer.Reset(tasks[0].ts.Sub(now))
-					drained = false
-					break
-				}
-			}
-		case <-ts.die:
-			return
-		}
-	}
-}
+// already delayed! execute immediately
+
+// properly reset timer to trigger based on the top element
 
 // prepend is the Stage 1 goroutine that collects externally submitted tasks
 // and feeds them into the Stage 2 worker pool via chTask.
-func (ts *TimedSched) prepend() {
-	var tasks []timedFunc
-	for {
-		select {
-		case <-ts.chPrependNotify:
-			ts.prependLock.Lock()
-			// swap slices to minimize time under lock
-			tasks, ts.prependTasks = ts.prependTasks, tasks[:0]
-			ts.prependLock.Unlock()
+func (ts *TimedSched) prepend() { _ = "STUB: not implemented"; return }
 
-			for k := range tasks {
-				select {
-				case ts.chTask <- tasks[k]:
-					tasks[k] = timedFunc{} // clear to avoid memory leak
-				case <-ts.die:
-					return
-				}
-			}
-			tasks = tasks[:0]
-		case <-ts.die:
-			return
-		}
-	}
-}
+// swap slices to minimize time under lock
+
+// clear to avoid memory leak
 
 // Put a function 'f' awaiting to be executed at 'deadline'
-func (ts *TimedSched) Put(f func(), deadline time.Time) {
-	ts.prependLock.Lock()
-	ts.prependTasks = append(ts.prependTasks, timedFunc{f, deadline})
-	ts.prependLock.Unlock()
-
-	select {
-	case ts.chPrependNotify <- struct{}{}:
-	default:
-	}
-}
+func (ts *TimedSched) Put(f func(), deadline time.Time) { _ = "STUB: not implemented"; return }
 
 // Close terminates this scheduler
-func (ts *TimedSched) Close() { ts.dieOnce.Do(func() { close(ts.die) }) }
+func (ts *TimedSched) Close() { _ = "STUB: not implemented"; return }

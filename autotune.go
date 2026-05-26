@@ -22,10 +22,6 @@
 
 package kcp
 
-import (
-	"sort"
-)
-
 const maxAutoTuneSamples = 258 // 256 + 2 extra samples for edge detection
 
 // pulse represents a single sample in the signal stream: a boolean bit
@@ -52,17 +48,12 @@ type autoTune struct {
 
 // Sample adds a signal sample to the pulse buffer using a ring buffer
 func (tune *autoTune) Sample(bit bool, seq uint32) {
+	_ = "STUB: not implemented"
 	// Write to current tail position
-	tune.pulses[tune.tail] = pulse{bit: bit, seq: seq}
-	tune.tail = (tune.tail + 1) % maxAutoTuneSamples
-
-	if tune.count < maxAutoTuneSamples {
-		tune.count++
-	} else {
-		// Buffer is full, advance head (discard oldest)
-		tune.head = (tune.head + 1) % maxAutoTuneSamples
-	}
+	return
 }
+
+// Buffer is full, advance head (discard oldest)
 
 // FindPeriod detects the period (pulse width) of the given signal type
 // in the collected samples. Returns -1 if no valid period is found.
@@ -89,69 +80,26 @@ func (tune *autoTune) Sample(bit bool, seq uint32) {
 //	    |-----------------------------------------------------> Time
 //	         A     B    C     D  E     F     G  H     I
 func (tune *autoTune) FindPeriod(bit bool) int {
+	_ = "STUB: not implemented"
 	// Need at least 3 samples to detect a period (rising and falling edges)
-	if tune.count < 3 {
-		return -1
-	}
-
-	// Copy elements from ring buffer to sortCache for sorting and analysis.
-	// Using fixed-size array to avoid heap allocation.
-	for i := 0; i < tune.count; i++ {
-		idx := (tune.head + i) % maxAutoTuneSamples
-		tune.sortCache[i] = tune.pulses[idx]
-	}
-
-	// Create a slice view over the cache for sorting
-	sorted := tune.sortCache[:tune.count]
-
-	// Sort the copied data by sequence number (seq) to ensure linear order for period calculation.
-	sort.Slice(sorted, func(i, j int) bool {
-		return _itimediff(sorted[i].seq, sorted[j].seq) < 0
-	})
-
-	// left edge
-	leftEdge := -1
-	lastPulse := sorted[0]
-	idx := 1
-
-	for ; idx < len(sorted); idx++ {
-		if lastPulse.seq+1 == sorted[idx].seq { // continuous sequence
-			if lastPulse.bit != bit && sorted[idx].bit == bit { // edge found
-				leftEdge = idx // mark left edge(the changed bit position)
-				break
-			}
-		} else {
-			return -1
-		}
-		lastPulse = sorted[idx]
-	}
-
-	// no left edge found
-	if leftEdge == -1 {
-		return -1
-	}
-
-	// right edge
-	rightEdge := -1
-	lastPulse = sorted[leftEdge]
-	idx = leftEdge + 1
-
-	for ; idx < len(sorted); idx++ {
-		if lastPulse.seq+1 == sorted[idx].seq {
-			if lastPulse.bit == bit && sorted[idx].bit != bit {
-				rightEdge = idx
-				break
-			}
-		} else {
-			return -1
-		}
-		lastPulse = sorted[idx]
-	}
-
-	// no right edge found
-	if rightEdge == -1 {
-		return -1
-	}
-
-	return rightEdge - leftEdge
+	return 0
 }
+
+// Copy elements from ring buffer to sortCache for sorting and analysis.
+// Using fixed-size array to avoid heap allocation.
+
+// Create a slice view over the cache for sorting
+
+// Sort the copied data by sequence number (seq) to ensure linear order for period calculation.
+
+// left edge
+
+// continuous sequence
+// edge found
+// mark left edge(the changed bit position)
+
+// no left edge found
+
+// right edge
+
+// no right edge found

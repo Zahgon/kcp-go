@@ -24,77 +24,15 @@ package kcp
 
 import (
 	"net"
-	"sync/atomic"
-
-	"github.com/pkg/errors"
 )
 
-func sameUDPAddr(a, b *net.UDPAddr) bool {
-	if a == nil || b == nil {
-		return false
-	}
-	if a.Port != b.Port || a.Zone != b.Zone {
-		return false
-	}
-	return a.IP.Equal(b.IP)
-}
+func sameUDPAddr(a, b *net.UDPAddr) bool { _ = "STUB: not implemented"; return false }
 
 // defaultReadLoop is the standard procedure for reading from a connection
-func (s *UDPSession) defaultReadLoop() {
-	buf := make([]byte, mtuLimit)
+func (s *UDPSession) defaultReadLoop() { _ = "STUB: not implemented"; return }
 
-	var src *net.UDPAddr
-	var srcStr string
-	if s.remote != nil {
-		if udp, ok := s.remote.(*net.UDPAddr); ok {
-			src = udp
-		} else {
-			srcStr = s.remote.String()
-		}
-	}
-	for {
-		n, addr, err := s.conn.ReadFrom(buf)
-		if err != nil {
-			s.notifyReadError(errors.WithStack(err))
-			return
-		}
-
-		if s.isClosed() {
-			return
-		}
-
-		// make sure the packet is from the same source
-		if src == nil && srcStr == "" { // set source address if nil
-			if udp, ok := addr.(*net.UDPAddr); ok {
-				src = udp
-			} else {
-				srcStr = addr.String()
-			}
-		} else if src != nil {
-			udp, ok := addr.(*net.UDPAddr)
-			if !ok || !sameUDPAddr(src, udp) {
-				atomic.AddUint64(&DefaultSnmp.InErrs, 1)
-				continue
-			}
-		} else if addr.String() != srcStr {
-			atomic.AddUint64(&DefaultSnmp.InErrs, 1)
-			continue
-		}
-
-		s.packetInput(buf[:n])
-	}
-}
+// make sure the packet is from the same source
+// set source address if nil
 
 // defaultReadLoop is the standard procedure for reading and accepting connections on a listener
-func (l *Listener) defaultMonitor() {
-	buf := make([]byte, mtuLimit)
-	for {
-		n, from, err := l.conn.ReadFrom(buf)
-		if err != nil {
-			l.notifyReadError(errors.WithStack(err))
-			return
-		}
-
-		l.packetInput(buf[:n], from)
-	}
-}
+func (l *Listener) defaultMonitor() { _ = "STUB: not implemented"; return }
